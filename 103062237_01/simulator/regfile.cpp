@@ -85,8 +85,8 @@ void regfile::addiu(unsigned int rs, unsigned int rt, int immediate, unsigned in
 	*PC += 1;
 }
 void regfile::lw   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
-	Register[rt] = ( Memory[Register[rs] + immediate] << 24 ) | ( Memory[Register[rs] + immediate + 1] << 16 ) |
-					( Memory[Register[rs] + immediate + 2] << 8 ) | ( Memory[Register[rs] + immediate + 3] );
+	Register[rt] = (( Memory[Register[rs] + immediate] << 24 ) & 0xFF000000) | (( Memory[Register[rs] + immediate + 1] << 16 ) & 0x00FF0000) |
+					(( Memory[Register[rs] + immediate + 2] << 8 ) & 0x0000FF00) | (( Memory[Register[rs] + immediate + 3] ) & 0x000000FF);
 	*PC += 1;
 }
 void regfile::lh   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
