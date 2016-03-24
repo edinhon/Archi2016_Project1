@@ -15,14 +15,11 @@ int main()
     memory memo;
 	regfile reg;
 	inst.readInstruction(&PC);
-	printf("cycle %d\n", i);
     memo.readMemory(&(reg.Register[29]));
+	printf("cycle %d\n", i);
 	reg.printRegister();
-	printf("$PC: 0x%0.8X\n", PC*4);
+	printf("PC: 0x%0.8X\n", PC*4);
     i++;
-	/*char a = 0x81, b = -0x80;
-	printf("%d %d", a, b);*/
-
 
 	while(inst.op != 0x3F){
 		inst.decode(PC);
@@ -30,7 +27,7 @@ int main()
 		if(inst.op != 0x3F){
 			printf("cycle %d\n", i);
 			reg.printRegister();
-			printf("$PC: 0x%0.8X\n", PC*4);
+			printf("PC: 0x%0.8X\n", PC*4);
 			i++;
 		}
 	}

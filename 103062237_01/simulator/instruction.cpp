@@ -151,7 +151,7 @@ void instruction::implement(unsigned int *PC, regfile *reg, char Memory[]){
     }
     //J-TYPE
     else if(op == 0x02){
-        *PC = address >> 2;
+        *PC = address;
     }
     else if(op == 0x03){
         reg->jal(address, PC);
