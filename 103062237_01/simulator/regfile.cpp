@@ -12,7 +12,7 @@ regfile::regfile(){
 
 void regfile::printRegister(){
 	for(int i = 0 ; i < 32 ; i++){
-		printf("$%d = %d\n", i, Register[i]);
+		printf("$%0.2d: 0x%0.8X\n", i, Register[i]);
 	}
 }
 
@@ -71,7 +71,7 @@ void regfile::sra (unsigned int rt, unsigned int rd, unsigned int shamt, unsigne
 	*PC += 1;
 }
 void regfile::jr  (unsigned int rs, unsigned int *PC){
-	*PC = Register[rs];
+	*PC = Register[rs] >> 2;
 }
 
 
@@ -85,29 +85,29 @@ void regfile::addiu(unsigned int rs, unsigned int rt, int immediate, unsigned in
 	*PC += 1;
 }
 void regfile::lw   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
-	Register[rt] = ( Memory[Register[rs] + immediate] << 24 ) + ( Memory[Register[rs] + immediate + 1] << 16 ) +
-					( Memory[Register[rs] + immediate + 2] << 8 ) + ( Memory[Register[rs] + immediate + 3] );
+	Register[rt] = ( Memory[Register[rs] + immediate] << 24 ) | ( Memory[Register[rs] + immediate + 1] << 16 ) |
+					( Memory[Register[rs] + immediate + 2] << 8 ) | ( Memory[Register[rs] + immediate + 3] );
 	*PC += 1;
 }
 void regfile::lh   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
-	Register[rt] = ((Memory[Register[rs] + immediate] << 24 ) >> 16) | (( Memory[Register[rs] + immediate + 1] << 24) >> 24) ;
+	Register[rt] = (((Memory[Register[rs] + immediate] << 24 ) >> 16) ) | ((( Memory[Register[rs] + immediate + 1] << 24) >> 24) );
 	//Register[rt] = Register[rt] & 0x0000FFFF;
 	*PC += 1;
 }
 void regfile::lhu  (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
-	Register[rt] = ((Memory[Register[rs] + immediate] << 24 ) >> 16) | (( Memory[Register[rs] + immediate + 1] << 24) >> 24);
-	Register[rt] = Register[rt] & 0x0000FFFF;
+	Register[rt] = (((Memory[Register[rs] + immediate] << 24 ) >> 16) & 0x0000FF00) | ((( Memory[Register[rs] + immediate + 1] << 24) >> 24) & 0x000000FF);
+	//Register[rt] = Register[rt] & 0x0000FFFF;
 	Register[rt] = (unsigned int)Register[rt];
 	*PC += 1;
 }
 void regfile::lb   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
-	Register[rt] = ((Memory[Register[rs] + immediate] << 24 ) >> 24);
+	Register[rt] = ((( Memory[Register[rs] + immediate] << 24) >> 24));
 	//Register[rt] = Register[rt] & 0x000000FF;
 	*PC += 1;
 }
 void regfile::lbu  (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
-	Register[rt] = ((Memory[Register[rs] + immediate] << 24 ) >> 24);
-	Register[rt] = Register[rt] & 0x000000FF;
+	Register[rt] = ((( Memory[Register[rs] + immediate] << 24) >> 24) & 0x000000FF);
+	//Register[rt] = Register[rt] & 0x000000FF;
 	Register[rt] = (unsigned int)Register[rt];
 	*PC += 1;
 }
@@ -166,6 +166,7 @@ void regfile::bgtz (unsigned int rs, int immediate, unsigned int *PC){
 
 //J-TYPE
 void regfile::jal  (unsigned int address, unsigned int *PC){
-	Register[31] = *PC + 1;
+	Register[31] = (*PC + 1);
+	Register[31] = Register[31] << 2;
 	*PC = address;
 }

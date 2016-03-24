@@ -25,7 +25,7 @@ void memory::readMemory(int *$sp){
     fread(&input[2], sizeof(unsigned char), 1, fPtr);
     fread(&input[3], sizeof(unsigned char), 1, fPtr);
     *$sp = ( input[0] << 24 ) + ( input[1] << 16 ) + ( input[2] <<  8 ) + input[3];
-	*$sp /= 4;
+	//*$sp /= 4;
 
     fread(&input[0], sizeof(unsigned char), 1, fPtr);
     fread(&input[1], sizeof(unsigned char), 1, fPtr);
