@@ -10,7 +10,7 @@ class regfile{
 public:
 
     regfile();
-	void printRegister();
+	void printRegister(FILE *snap);
 
 	//R-TYPE
     void add (unsigned int rs, unsigned int rt, unsigned int rd, unsigned int *PC);
@@ -49,6 +49,7 @@ public:
 	void jal  (unsigned int address, unsigned int *PC);
 
     int Register[32] = {0};
+	int error = 0;
 
 };
 

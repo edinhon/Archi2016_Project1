@@ -11,23 +11,42 @@ unsigned int PC = 0;
 int main()
 {
     int i = 0;
+	FILE *snap, *dump;
+	snap = fopen("snapshot.rpt", "wb");
+	dump = fopen("error_dump.rpt", "wb");
     instruction inst;
     memory memo;
 	regfile reg;
+
 	inst.readInstruction(&PC);
     memo.readMemory(&(reg.Register[29]));
-	printf("cycle %d\n", i);
-	reg.printRegister();
-	printf("PC: 0x%0.8X\n", PC*4);
+	fprintf(snap, "cycle %d\n", i);
+	reg.printRegister(snap);
+	fprintf(snap, "PC: 0x%0.8X\n\n\n", PC*4);
     i++;
 
-	while(inst.op != 0x3F){
+
+
+	while(inst.op != 0x3F && reg.error < 3){
 		inst.decode(PC);
 		inst.implement(&PC, &reg, memo.D_memory);
-		if(inst.op != 0x3F){
-			printf("cycle %d\n", i);
-			reg.printRegister();
-			printf("PC: 0x%0.8X\n", PC*4);
+		if(reg.error != 0){
+			if(reg.error == 1){
+				reg.error = 0;
+				fprintf(dump,  "In cycle %d: Write $0 Error\n", i);
+			}else if(reg.error == 2){
+				reg.error = 0;
+				fprintf(dump, "In cycle %d: Number Overflow\n", i);
+			}else if(reg.error == 3){
+				fprintf(dump, "In cycle %d: Address Overflow\n", i);
+			}else if(reg.error == 4){
+				fprintf(dump, "In cycle %d: Misalignment Error\n", i);
+			}
+		}
+		if(inst.op != 0x3F && reg.error < 3){
+			fprintf(snap, "cycle %d\n", i);
+			reg.printRegister(snap);
+			fprintf(snap, "PC: 0x%0.8X\n\n\n", PC*4);
 			i++;
 		}
 	}

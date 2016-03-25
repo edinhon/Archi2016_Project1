@@ -10,14 +10,26 @@ regfile::regfile(){
     Register[29] = 0x400;
 }
 
-void regfile::printRegister(){
+void regfile::printRegister(FILE *snap){
 	for(int i = 0 ; i < 32 ; i++){
-		printf("$%0.2d: 0x%0.8X\n", i, Register[i]);
+		fprintf(snap, "$%0.2d: 0x%0.8X\n", i, Register[i]);
 	}
 }
 
 //R-TYPE
 void regfile::add (unsigned int rs, unsigned int rt, unsigned int rd, unsigned int *PC){
+	if(Register[rs] > 0 && Register[rt] > 0 && (Register[rs] + Register[rt]) < 0){
+		error = 2;
+		//printf("Number Overflow\n");
+		*PC += 1;
+		return ;
+	}
+	else if(Register[rs] < 0 && Register[rt] < 0 && (Register[rs] + Register[rt]) > 0){
+		error = 2;
+		//printf("Number Overflow\n");
+		*PC += 1;
+		return ;
+	}
 	Register[rd] = Register[rs] + Register[rt];
 	*PC += 1;
 }
@@ -26,6 +38,18 @@ void regfile::addu(unsigned int rs, unsigned int rt, unsigned int rd, unsigned i
 	*PC += 1;
 }
 void regfile::sub (unsigned int rs, unsigned int rt, unsigned int rd, unsigned int *PC){
+	if(Register[rs] > 0 && Register[rt] < 0 && (Register[rs] - Register[rt]) < 0){
+		error = 2;
+		//printf("Number Overflow\n");
+		*PC += 1;
+		return ;
+	}
+	else if(Register[rs] < 0 && Register[rt] > 0 && (Register[rs] - Register[rt]) > 0){
+		error = 2;
+		//printf("Number Overflow\n");
+		*PC += 1;
+		return ;
+	}
 	Register[rd] = Register[rs] - Register[rt];
 	*PC += 1;
 }
@@ -85,33 +109,183 @@ void regfile::addiu(unsigned int rs, unsigned int rt, int immediate, unsigned in
 	*PC += 1;
 }
 void regfile::lw   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
+	//error "Address Overflow"
+	if((Register[rs] + immediate + 4) > Register[29]){
+		error = 3;
+		//printf("Address Overflow\n");
+		return ;
+	}
+	//error "Misalignment Error"
+	else if((Register[rs] + immediate)%4 != 0){
+		error = 4;
+		//printf("Misalignment Error\n");
+		return ;
+	}
+	//error "Number Overflow"
+	else{
+		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+		else if(Register[rs] < 0 && immediate < 0 && (Register[rs] + immediate) > 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+	}
 	Register[rt] = (( Memory[Register[rs] + immediate] << 24 ) & 0xFF000000) | (( Memory[Register[rs] + immediate + 1] << 16 ) & 0x00FF0000) |
 					(( Memory[Register[rs] + immediate + 2] << 8 ) & 0x0000FF00) | (( Memory[Register[rs] + immediate + 3] ) & 0x000000FF);
 	*PC += 1;
 }
 void regfile::lh   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
+	//error "Address Overflow"
+	if((Register[rs] + immediate + 2) > Register[29]){
+		error = 3;
+		//printf("Address Overflow\n");
+		return ;
+	}
+	//error "Misalignment Error"
+	else if((Register[rs] + immediate)%2 != 0){
+		error = 4;
+		//printf("Misalignment Error\n");
+		return ;
+	}
+	//error "Number Overflow"
+	else{
+		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+		else if(Register[rs] < 0 && immediate < 0 && (Register[rs] + immediate) > 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+	}
 	Register[rt] = (((Memory[Register[rs] + immediate] << 24 ) >> 16) ) | ((( Memory[Register[rs] + immediate + 1] << 24) >> 24) );
 	//Register[rt] = Register[rt] & 0x0000FFFF;
 	*PC += 1;
 }
 void regfile::lhu  (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
+	//error "Address Overflow"
+	if((Register[rs] + immediate + 2) > Register[29]){
+		error = 3;
+		//printf("Address Overflow\n");
+		return ;
+	}
+	//error "Misalignment Error"
+	else if((Register[rs] + immediate)%2 != 0){
+		error = 4;
+		//printf("Misalignment Error\n");
+		return ;
+	}
+	//error "Number Overflow"
+	else{
+		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+		else if(Register[rs] < 0 && immediate < 0 && (Register[rs] + immediate) > 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+	}
 	Register[rt] = (((Memory[Register[rs] + immediate] << 24 ) >> 16) & 0x0000FF00) | ((( Memory[Register[rs] + immediate + 1] << 24) >> 24) & 0x000000FF);
 	//Register[rt] = Register[rt] & 0x0000FFFF;
 	Register[rt] = (unsigned int)Register[rt];
 	*PC += 1;
 }
 void regfile::lb   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
+	//error "Address Overflow"
+	if((Register[rs] + immediate + 1) > Register[29]){
+		error = 3;
+		//printf("Address Overflow\n");
+		return ;
+	}
+	//error "Number Overflow"
+	else{
+		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+		else if(Register[rs] < 0 && immediate < 0 && (Register[rs] + immediate) > 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+	}
 	Register[rt] = ((( Memory[Register[rs] + immediate] << 24) >> 24));
 	//Register[rt] = Register[rt] & 0x000000FF;
 	*PC += 1;
 }
 void regfile::lbu  (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
+	//error "Address Overflow"
+	if((Register[rs] + immediate + 1) > Register[29]){
+		error = 3;
+		//printf("Address Overflow\n");
+		return ;
+	}
+	//error "Number Overflow"
+	else{
+		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+		else if(Register[rs] < 0 && immediate < 0 && (Register[rs] + immediate) > 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+	}
 	Register[rt] = ((( Memory[Register[rs] + immediate] << 24) >> 24) & 0x000000FF);
 	//Register[rt] = Register[rt] & 0x000000FF;
 	Register[rt] = (unsigned int)Register[rt];
 	*PC += 1;
 }
 void regfile::sw   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
+	//error "Address Overflow"
+	if((Register[rs] + immediate + 4) > Register[29]){
+		error = 3;
+		//printf("Address Overflow\n");
+		return ;
+	}
+	//error "Misalignment Error"
+	else if((Register[rs] + immediate)%4 != 0){
+		error = 4;
+		//printf("Misalignment Error\n");
+		return ;
+	}
+	//error "Number Overflow"
+	else{
+		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+		else if(Register[rs] < 0 && immediate < 0 && (Register[rs] + immediate) > 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+	}
 	Memory[Register[rs] + immediate] = ( Register[rt] >> 24 ) & 0x000000FF;
 	Memory[Register[rs] + immediate + 1] = ( Register[rt] << 8 ) >> 24 & 0x000000FF;
 	Memory[Register[rs] + immediate + 2] = ( Register[rt] << 16 ) >> 24 & 0x000000FF;
@@ -119,6 +293,33 @@ void regfile::sw   (unsigned int rs, unsigned int rt, int immediate, unsigned in
 	*PC += 1;
 }
 void regfile::sh   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
+	//error "Address Overflow"
+	if((Register[rs] + immediate + 2) > Register[29]){
+		error = 3;
+		//printf("Address Overflow\n");
+		return ;
+	}
+	//error "Misalignment Error"
+	else if((Register[rs] + immediate)%2 != 0){
+		error = 4;
+		//printf("Misalignment Error\n");
+		return ;
+	}
+	//error "Number Overflow"
+	else{
+		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+		else if(Register[rs] < 0 && immediate < 0 && (Register[rs] + immediate) > 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+	}
 	Memory[Register[rs] + immediate] = ( (Register[rt]&0x0000FFFF) << 16 ) >> 24;
 	Memory[Register[rs] + immediate] = Memory[Register[rs] + immediate] & 0x000000FF;
 	Memory[Register[rs] + immediate + 1] = ( (Register[rt]&0x0000FFFF) << 24 ) >> 24;
@@ -126,6 +327,27 @@ void regfile::sh   (unsigned int rs, unsigned int rt, int immediate, unsigned in
 	*PC += 1;
 }
 void regfile::sb   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
+	//error "Address Overflow"
+	if((Register[rs] + immediate + 1) > Register[29]){
+		error = 3;
+		//printf("Address Overflow\n");
+		return ;
+	}
+	//error "Number Overflow"
+	else{
+		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+		else if(Register[rs] < 0 && immediate < 0 && (Register[rs] + immediate) > 0){
+			error = 2;
+			//printf("Number Overflow\n");
+			*PC += 1;
+			return ;
+		}
+	}
 	Memory[Register[rs] + immediate] = ( (Register[rt]&0x000000FF) << 24 ) >> 24 & 0x000000FF;
 	Memory[Register[rs] + immediate] = Memory[Register[rs] + immediate] & 0x000000FF;
 	*PC += 1;

@@ -96,8 +96,22 @@ void instruction::implement(unsigned int *PC, regfile *reg, char Memory[]){
 	//printf("%X\n", op);
 	//R-TYPE
     if(op == 0x00){
+		//error "Write to register $0"
+		if(funct != 0x08 && rd == 0x00){
+			//sll $0, $0, 0
+			if(rt == 0 && shamt == 0){
+				reg->sll(rt, rd, shamt, PC);
+			}
+			//error "Write to register $0"
+			else{
+				reg->error = 1;
+				//printf("Write to register $0\n");
+				*PC += 1;
+				return ;
+			}
+		}
 		//add
-        if(funct == 0x20){
+        else if(funct == 0x20){
 			reg->add(rs, rt, rd, PC);
 		}
 		//addu
@@ -162,8 +176,15 @@ void instruction::implement(unsigned int *PC, regfile *reg, char Memory[]){
     }
     //I-TYPE
     else{
+		//error "Write to register $0"
+		if(op != 0x2B && op != 0x29 && op != 0x28 && op != 0x04 && op != 0x05 && op != 0x07 && rt == 0x00){
+			reg->error = 1;
+			//printf("Write to register $0\n");
+			*PC += 1;
+			return ;
+		}
 		//addi
-        if(op == 0x08){
+        else if(op == 0x08){
 			reg->addi(rs, rt, immediate, PC);
 		}
 		//addiu
