@@ -49,7 +49,7 @@ public:
 	void jal  (unsigned int address, unsigned int *PC);
 
     int Register[32] = {0};
-	int error = 0;
+	bool error[4];
 
 };
 

@@ -12,8 +12,8 @@ int main()
 {
     int i = 0;
 	FILE *snap, *dump;
-	snap = fopen("snapshot.rpt", "wb");
-	dump = fopen("error_dump.rpt", "wb");
+	snap = fopen("snapshot.rpt", "w");
+	dump = fopen("error_dump.rpt", "w");
     instruction inst;
     memory memo;
 	regfile reg;
@@ -27,23 +27,23 @@ int main()
 
 
 
-	while(inst.op != 0x3F && reg.error < 3){
+	while(inst.op != 0x3F && !reg.error[2] && !reg.error[3]){
 		inst.decode(PC);
 		inst.implement(&PC, &reg, memo.D_memory);
 		if(reg.error != 0){
-			if(reg.error == 1){
-				reg.error = 0;
+			if(reg.error[0]){
+				reg.error[0] = false;
 				fprintf(dump,  "In cycle %d: Write $0 Error\n", i);
-			}else if(reg.error == 2){
-				reg.error = 0;
+			}else if(reg.error[1]){
+				reg.error[1] = false;
 				fprintf(dump, "In cycle %d: Number Overflow\n", i);
-			}else if(reg.error == 3){
+			}else if(reg.error[2]){
 				fprintf(dump, "In cycle %d: Address Overflow\n", i);
-			}else if(reg.error == 4){
+			}else if(reg.error[3]){
 				fprintf(dump, "In cycle %d: Misalignment Error\n", i);
 			}
 		}
-		if(inst.op != 0x3F && reg.error < 3){
+		if(inst.op != 0x3F && !reg.error[2] && !reg.error[3]){
 			fprintf(snap, "cycle %d\n", i);
 			reg.printRegister(snap);
 			fprintf(snap, "PC: 0x%0.8X\n\n\n", PC*4);
