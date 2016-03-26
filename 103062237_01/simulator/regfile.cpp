@@ -219,14 +219,12 @@ void regfile::lw   (unsigned int rs, unsigned int rt, int immediate, unsigned in
 		*PC += 1;
 	}
 	//error "Address Overflow"
-	if((Register[rs] + immediate + 4) > Register[29]){
+	if((Register[rs] + immediate + 4) >= 1024 || (Register[rs] + immediate) < 0){
 		error[2] = true;
-		//printf("Address Overflow\n");
 	}
 	//error "Misalignment Error"
 	if((Register[rs] + immediate)%4 != 0){
 		error[3] = true;
-		//printf("Misalignment Error\n");
 	}
 	//error "Number Overflow"
 		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
@@ -250,14 +248,12 @@ void regfile::lh   (unsigned int rs, unsigned int rt, int immediate, unsigned in
 		*PC += 1;
 	}
 	//error "Address Overflow"
-	if((Register[rs] + immediate + 2) > Register[29]){
+	if((Register[rs] + immediate + 2) >= 1024 || (Register[rs] + immediate) < 0){
 		error[2] = true;
-		//printf("Address Overflow\n");
 	}
 	//error "Misalignment Error"
 	if((Register[rs] + immediate)%2 != 0){
 		error[3] = true;
-		//printf("Misalignment Error\n");
 	}
 	//error "Number Overflow"
 		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
@@ -281,14 +277,12 @@ void regfile::lhu  (unsigned int rs, unsigned int rt, int immediate, unsigned in
 		*PC += 1;
 	}
 	//error "Address Overflow"
-	if((Register[rs] + immediate + 2) > Register[29]){
+	if((Register[rs] + immediate + 2) >= 1024 || (Register[rs] + immediate) < 0){
 		error[2] = true;
-		//printf("Address Overflow\n");
 	}
 	//error "Misalignment Error"
 	if((Register[rs] + immediate)%2 != 0){
 		error[3] = true;
-		//printf("Misalignment Error\n");
 	}
 	//error "Number Overflow"
 		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
@@ -313,9 +307,8 @@ void regfile::lb   (unsigned int rs, unsigned int rt, int immediate, unsigned in
 		*PC += 1;
 	}
 	//error "Address Overflow"
-	if((Register[rs] + immediate + 1) > Register[29]){
+	if((Register[rs] + immediate + 1) >= 1024 || (Register[rs] + immediate) < 0){
 		error[2] = true;
-		//printf("Address Overflow\n");
 	}
 	//error "Number Overflow"
 		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
@@ -339,9 +332,8 @@ void regfile::lbu  (unsigned int rs, unsigned int rt, int immediate, unsigned in
 		*PC += 1;
 	}
 	//error "Address Overflow"
-	if((Register[rs] + immediate + 1) > Register[29]){
+	if((Register[rs] + immediate + 1) >= 1024 || (Register[rs] + immediate) < 0){
 		error[2] = true;
-		//printf("Address Overflow\n");
 	}
 	//error "Number Overflow"
 		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
@@ -361,14 +353,12 @@ void regfile::lbu  (unsigned int rs, unsigned int rt, int immediate, unsigned in
 }
 void regfile::sw   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
 	//error "Address Overflow"
-	if((Register[rs] + immediate + 4) > Register[29]){
+	if((Register[rs] + immediate + 4) >= 1024 || (Register[rs] + immediate) < 0){
 		error[2] = true;
-		//printf("Address Overflow\n");
 	}
 	//error "Misalignment Error"
 	if((Register[rs] + immediate)%4 != 0){
 		error[3] = true;
-		//printf("Misalignment Error\n");
 	}
 	//error "Number Overflow"
 		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
@@ -389,14 +379,12 @@ void regfile::sw   (unsigned int rs, unsigned int rt, int immediate, unsigned in
 }
 void regfile::sh   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
 	//error "Address Overflow"
-	if((Register[rs] + immediate + 2) > Register[29]){
+	if((Register[rs] + immediate + 2) >= 1024 || (Register[rs] + immediate) < 0){
 		error[2] = true;
-		//printf("Address Overflow\n");
 	}
 	//error "Misalignment Error"
 	if((Register[rs] + immediate)%2 != 0){
 		error[3] = true;
-		//printf("Misalignment Error\n");
 	}
 	//error "Number Overflow"
 		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
@@ -417,9 +405,8 @@ void regfile::sh   (unsigned int rs, unsigned int rt, int immediate, unsigned in
 }
 void regfile::sb   (unsigned int rs, unsigned int rt, int immediate, unsigned int *PC, char Memory[]){
 	//error "Address Overflow"
-	if((Register[rs] + immediate + 1) > Register[29]){
+	if((Register[rs] + immediate + 1) >= 1024 || (Register[rs] + immediate) < 0){
 		error[2] = true;
-		//printf("Address Overflow\n");
 	}
 	//error "Number Overflow"
 		if(Register[rs] > 0 && immediate > 0 && (Register[rs] + immediate) < 0){
