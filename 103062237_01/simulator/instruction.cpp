@@ -55,39 +55,39 @@ void instruction::decode(unsigned int i){
     //R-TYPE
     if(op == 0x00){
         rs = (I_memory[i] << 6);
-        rs = rs >> 27;
+        rs = (rs >> 27);
         rt = (I_memory[i] << 11);
-        rt = rt >> 27;
+        rt = (rt >> 27);
         rd = (I_memory[i] << 16);
-        rd = rd >> 27;
+        rd = (rd >> 27);
         shamt = (I_memory[i] << 21);
-        shamt = shamt >> 27;
+        shamt = (shamt >> 27);
         funct = (I_memory[i] << 26);
-        funct = funct >> 26;
+        funct = (funct >> 26);
         //printf("%X %X %X %X %X\n", rs, rt, rd, shamt, funct);
     }
     //J-TYPE
     else if(op == 0x02){
         address = (I_memory[i] << 6);
-        address = address >> 6;
+        address = (address >> 6);
     }
     else if(op == 0x03){
         address = (I_memory[i] << 6);
-        address = address >> 6;
+        address = (address >> 6);
     }
     //halt
     else if(op == 0x3F){
         address = (I_memory[i] << 6);
-        address = address >> 6;
+        address = (address >> 6);
     }
     //I-TYPE
     else{
         rs = (I_memory[i] << 6);
-        rs = rs >> 27;
+        rs = (rs >> 27);
         rt = (I_memory[i] << 11);
-        rt = rt >> 27;
+        rt = (rt >> 27);
         immediate = (I_memory[i] << 16);
-        immediate = immediate >> 16;
+        immediate = (immediate >> 16);
     }
 
 }

@@ -34,12 +34,12 @@ int main()
 			if(reg.error[0]){
 				reg.error[0] = false;
 				fprintf(dump,  "In cycle %d: Write $0 Error\n", i);
-			}else if(reg.error[1]){
+			}if(reg.error[1]){
 				reg.error[1] = false;
 				fprintf(dump, "In cycle %d: Number Overflow\n", i);
-			}else if(reg.error[2]){
+			}if(reg.error[2]){
 				fprintf(dump, "In cycle %d: Address Overflow\n", i);
-			}else if(reg.error[3]){
+			}if(reg.error[3]){
 				fprintf(dump, "In cycle %d: Misalignment Error\n", i);
 			}
 		}
@@ -47,6 +47,8 @@ int main()
 			fprintf(snap, "cycle %d\n", i);
 			reg.printRegister(snap);
 			fprintf(snap, "PC: 0x%0.8X\n\n\n", PC*4);
+			/*fprintf(snap, "op code: 0x%0.2X\n", inst.op);
+			if(inst.op == 0x00) fprintf(snap, "funct: 0x%0.2X\n\n\n", inst.funct);*/
 			i++;
 		}
 	}
